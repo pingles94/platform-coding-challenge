@@ -1,0 +1,39 @@
+Cases:
+Case Name         | What it tests                                        | Current status when run
+Valid input 1:    | Standard test case from document                     | PASS
+Valid input 2:    | Running into wall, should not cross wall             | PASS
+Invalid input 1:  | Starting coordinate is outside room coordinates      | FAIL
+Invalid input 2:  | One or more patches is outside room coordinates      | FAIL
+Invalid input 3:  | Room coordinate has negative number                  | FAIL
+Invalid input 4:  | One or more ints is a string                         | PASS
+Invalid input 5:  | One or more navigation steps is not a real direction | FAIL (NO RESPONSE)
+Invalid input 6:  | Input json is completely invalid                     | PASS
+Invalid input 7:  | Two or more patches are identical                    | FAIL
+Invalid input 8:  | The room has no dimensions                           | FAIL (NO RESPONSE)
+Invalid input 9:  | The room has one dimension                           | FAIL
+Invalid input 10: | Multiple starting coordinates                        | PASS
+Invalid input 11: | Empty room dimensions                                | FAIL
+Invalid input 12: | More than 2 room dimensions                          | FAIL
+Invalid input 13: | Have a string as a room dimension                    | PASS
+Invalid input 14: | Empty starting coordinate                            | FAIL (NO RESPONSE)
+Invalid input 15: | Decimal number in room coordinates                   | FAIL
+Invalid input 16: | Decimal number in starting coordinates               | FAIL
+Invalid input 17: | Starting coordinate has a negative number            | FAIL (NO RESPONSE)
+
+Caveats
+1. For a lot of these cases, I wrote a test for 1 possible configuration but not all, which I would do for an actual test suite. For example when testing hitting the walls, I only wrote a case where the roomba hits the North wall, whereas in a full test suite I would also check the East, South, and West walls. I tested these manually just to make sure the behavior was the same but didn't write cases for them. This was just done in the interest of time and readability since otherwise the number of test cases would balloon for this exercise. When writing real code, I would include all of these test cases.
+2. I put each input and output text in its own file just to make it easier for me for this exercise but it can all be combined, and just use variables for each attribute in the step definition.
+3. I have not automated anything run on Docker before so I didn't know how to actually get my test suite to run against the service. Therefore, I manually ran each of these cases to find out which ones passed and failed. Given enough time, I could've figured this out, but I was extremely busy as well as in a time crunch to submit this.
+4. I assume a 400 error for each invalid input but some of these may need different codes, such as 422.
+5. This was all functional testing, I didn't do any load/stress testing, performance testing, usability testing, etc.
+
+Current bugs found
+1. Service accepts starting coordinates that are outside the room coordinates, which it should reject.
+2. Service accepts patch coordinates outside room coordinates, which it should reject.
+3. Service accepts a room with negative X or Y coordinates, which it should reject. Similarly, it accepts a negative starting coordinate but doesn't return anything, when it should return an error.
+4. Service accepts, but does not work, when given a direction other than 'NSEW'. This is true for any character (including digits and special chars) that is not 'NSEW'. Instead, it should reject the payload.
+5. Service accepts multiple patches in the same location. This might actually be expected behavior.
+6. Service accepts a room with 1 or no dimensions (although it does treat those situations differently), but it should reject both.
+7. Passing in an empty array for the room coordinates throws a 500 error, when instead it should throw a 400 error. Also, passing in an array with more than 2 numbers results in the service accepting the first 2 numbers, when it should reject the json object.
+8. The service accepts an empty array for the starting coodinates but doesn't return anything, when it should be throwing an error instead.
+9. Service accepts a decimal number as a room or starting coordinate and (presumably) rounds it down. This might be ok.
